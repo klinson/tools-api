@@ -33,6 +33,7 @@ $api->version('v1', [
     ], function ($api) {
         $api->post('characterRecognition/general', 'CharacterRecognitionController@general');
 
+        $api->post('portrait/score', 'PortraitController@score');
     });
 
     // 需要登录的路由
