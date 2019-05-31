@@ -31,6 +31,7 @@ $api->version('v1', [
     $api->group([
 
     ], function ($api) {
+        $api->post('characterRecognition/general', 'CharacterRecognitionController@general');
 
     });
 
