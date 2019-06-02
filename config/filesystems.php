@@ -70,6 +70,14 @@ return [
             'url' => env('APP_URL').'/uploads',
         ],
 
+        // 人像识别结果文件
+        'portraits' => [
+            'driver' => 'local',
+            'root' => public_path('portraits'),
+            'visibility' => 'public',
+            'url' => env('APP_URL').'/portraits',
+        ],
+
         'backup' => [
             'driver' => 'local',
             'root' => storage_path('app/backup'),
