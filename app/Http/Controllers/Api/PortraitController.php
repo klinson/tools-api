@@ -22,20 +22,40 @@ use Image;
  */
 class PortraitController extends Controller
 {
-    public function score(Request $request)
+    protected $types = [
+        'score' => [
+            'api' => 'appraiseScore',
+            'qr_path' => 'pages/tools/portrait/index?type=score'
+        ],
+        'pk' => [
+            'api' => 'competeAppearance',
+            'qr_path' => 'pages/tools/portrait/index?type=pk'
+        ],
+        'cp' => [
+            'api' => 'speculateCP',
+            'qr_path' => 'pages/tools/portrait/index?type=cp'
+        ],
+        'who_treat' => [
+            'api' => 'whoTreat',
+            'qr_path' => 'pages/tools/portrait/index?type=who_treat'
+        ],
+    ];
+    public function index($type, Request $request)
     {
         $img_base64 = $request->img;
-        $res = XiaoIce::getInstance()->appraiseScore($img_base64, true);
+        $method = $this->types[$type]['api'];
+        $res = XiaoIce::getInstance()->$method($img_base64, true);
 //        $res = [
 //            'image_url' => '',
 //            'text' => '在各类人群中，德国女士给这张脸评分最高，8.4分。讲真的，这人的下巴，看上去很有傲气'
 //        ];
-        $res['image_url'] = $this->saveWithQrcode($res['image_url'], $res['text']);
+        $res['image_url'] = $this->saveWithQrcode($res['image_url'], $res['text'], $this->types[$type]['qr_path']);
 
         return $this->response->array($res);
     }
 
-    protected function saveWithQrcode($url, $text = '')
+
+    protected function saveWithQrcode($url, $text = '', $qr_path = '')
     {
         // 文件本地存储
         $file_path = date('Ymd').'-'.uniqid().'1.png';
@@ -51,7 +71,7 @@ class PortraitController extends Controller
         $image->resizeCanvas(0, $image->height()-60+$add_height, 'top', false, '#000000');
 
         // 加上邀请二维码
-        $qrcode_path = WechatHandler::getInstance()->getWxacode($add_height, '');
+        $qrcode_path = WechatHandler::getInstance()->getWxacode($add_height, $qr_path);
         $image->insert($qrcode_path, 'bottom-right', 0, 0);
 
         // 加入文字
