@@ -42,16 +42,24 @@ class PortraitController extends Controller
     ];
     public function index($type, Request $request)
     {
-        $img_base64 = $request->img;
-        $method = $this->types[$type]['api'];
-        $res = XiaoIce::getInstance()->$method($img_base64, true);
-//        $res = [
-//            'image_url' => '',
-//            'text' => '在各类人群中，德国女士给这张脸评分最高，8.4分。讲真的，这人的下巴，看上去很有傲气'
-//        ];
-        $res['image_url'] = $this->saveWithQrcode($res['image_url'], $res['text'], $this->types[$type]['qr_path']);
+        try {
+            $img_base64 = $request->img;
+            $method = $this->types[$type]['api'];
 
-        return $this->response->array($res);
+            $res = XiaoIce::getInstance()->$method($img_base64, true);
+//            $res = [
+//                'image_url' => '',
+//                'text' => '在各类人群中，德国女士给这张脸评分最高，8.4分。讲真的，这人的下巴，看上去很有傲气'
+//            ];
+
+            $res['image_url'] = $this->saveWithQrcode($res['image_url'], $res['text'], $this->types[$type]['qr_path']);
+            return $this->response->array($res);
+        } catch (\Exception $exception) {
+            if ($exception->getCode() <= 4 && $exception->getCode() > 0) {
+                return $this->response->errorBadRequest('系统评分发生错误，请稍后重试');
+            }
+            return $this->response->errorBadRequest($exception->getMessage());
+        }
     }
 
 
