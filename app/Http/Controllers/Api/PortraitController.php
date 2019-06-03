@@ -66,11 +66,12 @@ class PortraitController extends Controller
     protected function saveWithQrcode($url, $text = '', $qr_path = '')
     {
         // 文件本地存储
-        $file_path = date('Ymd').'-'.uniqid().'1.png';
+        $file_path = date('Ymd').'-'.uniqid().'.png';
 //        $file_path = '20190602-5cf3b8e625ee5.png';
-        Storage::disk('portraits')->put($file_path, file_get_contents($url));
+//        Storage::disk('portraits')->put($file_path, file_get_contents($url));
         $file_realpath = Storage::disk('portraits')->path($file_path);
-        $image = Image::make($file_realpath);
+//        $image = Image::make($file_realpath);
+        $image = Image::make($url);
 
         // 裁剪去掉小冰水印
         $image->crop($image->width(), $image->height() - 60, 0, 0);
