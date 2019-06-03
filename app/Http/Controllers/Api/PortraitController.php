@@ -69,7 +69,7 @@ class PortraitController extends Controller
                 $image->text($line_text, 20, $start_height+$font_size*$i, function ($font) use ($font_size) {
                     $font->file('font/kaiti.ttf');
                     $font->size($font_size);
-                    $font->color('#ffffff');
+                    $font->color('#EEC900');
                 });
                 $i++;
             }
