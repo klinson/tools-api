@@ -24,6 +24,7 @@ $api->version('v1', [
         'prefix' => 'auth'
     ], function ($api) {
         $api->post('login', 'AuthorizationsController@login');
+        $api->post('wxappLogin', 'AuthorizationsController@wxappLogin');
         $api->post('logout', 'AuthorizationsController@logout');
     });
 

@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Models\Traits\IntTimestampsHelper;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable, IntTimestampsHelper;
+    use Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -17,7 +18,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'wxapp_openid', 'nickname', 'sex', 'avatar', 'wechat_info'
     ];
 
     /**

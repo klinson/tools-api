@@ -15,12 +15,13 @@ use Faker\Generator as Faker;
 
 $factory->define(App\Models\User::class, function (Faker $faker) {
     return [
-        'username' => str_random(10),
+        'wxapp_openid' => str_random(50),
+        'nickname' => str_random(10),
         'name' => $faker->name,
-        'email' => $faker->unique()->safeEmail,
-        'password' => bcrypt('12345678'), // secret
+        'avatar' => asset('images/avatar.png'),
         'sex' => $faker->randomKey([0, 1]),
-        'created_at' => $faker->unixTime(),
-        'updated_at' => $faker->unixTime(),
+        'wechat_info' => '{}',
+        'created_at' => date('Y-m-d'),
+        'updated_at' => date('Y-m-d'),
     ];
 });

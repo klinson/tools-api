@@ -15,19 +15,19 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('username', 50)->comment('账号');
-            $table->string('name', 50)->comment('姓名');
-            $table->string('nickname', 100)->nullable()->comment('昵称');
-            $table->tinyInteger('sex')->default(1)->comment('性别: 1-男, 0-女');
-            $table->string('email')->nullable()->comment('邮箱');
-            $table->string('password')->nullable();
+            $table->string('wxapp_openid');
+            $table->string('nickname');
+            $table->string('name', 50);
+            $table->tinyInteger('sex')->default(0);
+            $table->string('avatar')->nullbale();
+            $table->json('wechat_info')->nullbale();
+
             $table->string('mobile', 20)->nullable()->comment('手机');
             $table->tinyInteger('has_enabled')->default(1)->comment('是否启用');
 
             $table->rememberToken();
-            $table->unsignedInteger('created_at')->default(0);
-            $table->unsignedInteger('updated_at')->default(0);
-            $table->unsignedInteger('deleted_at')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

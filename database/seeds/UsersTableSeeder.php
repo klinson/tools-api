@@ -26,10 +26,7 @@ class UsersTableSeeder extends Seeder
         // 单独处理几个用户的数据
         $user = User::find(1);
         $user->name = 'klinson';
-        $user->nickname = 'klinson专用测试账号';
-        $user->username = 'klinson';
-        $user->email = 'klinson@zemcho.com';
-        $user->password = bcrypt('klinson');
+        $user->nickname = 'klinson';
         $user->save();
     }
 }
