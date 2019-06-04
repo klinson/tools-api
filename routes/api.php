@@ -39,12 +39,15 @@ $api->version('v1', [
         $api->get('configs/{key}', 'SystemController@getConfig')->where('key', '^(weapp_contact_information|wxapp_about_us)$');
 
         $api->get('weather', 'SystemController@weather');
+
+        $api->post('files/uploadImage', 'FilesController@image');
     });
 
     // 需要登录的路由
     $api->group([
         'middleware' => 'refresh.token'
     ], function ($api) {
+        $api->put('user', 'UserController@update');
 
     });
 });

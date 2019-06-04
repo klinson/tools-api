@@ -70,6 +70,13 @@ return [
             'url' => env('APP_URL').'/uploads',
         ],
 
+        'wechat_upload' => [
+            'driver' => 'local',
+            'root' => public_path('uploads/wechat'),
+            'visibility' => 'public',
+            'url' => env('APP_URL').'/uploads/wechat',
+        ],
+
         // 人像识别结果文件
         'portraits' => [
             'driver' => 'local',
