@@ -41,6 +41,10 @@ $api->version('v1', [
         $api->get('weather', 'SystemController@weather');
 
         $api->post('files/uploadImage', 'FilesController@image');
+
+        // 论坛
+        $api->get('postCategories', 'PostsController@categories');
+
     });
 
     // 需要登录的路由
