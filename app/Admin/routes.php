@@ -55,4 +55,6 @@ Route::group([
     // 系统
     $router->get('system/aboutUs', 'SystemController@aboutUs');
     $router->post('system/aboutUs', 'SystemController@storeAboutUs');
+
+    $router->resource('postCategories', PostCategoriesController::class);
 });
