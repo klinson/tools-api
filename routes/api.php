@@ -35,6 +35,10 @@ $api->version('v1', [
         $api->post('characterRecognition/general', 'CharacterRecognitionController@general');
 
         $api->post('portrait/{type}', 'PortraitController@index')->where('type', '^(score|pk|cp|who_treat)$');;
+
+        $api->get('configs/{key}', 'SystemController@getConfig')->where('key', '^(weapp_contact_information|wxapp_about_us)$');
+
+        $api->get('weather', 'SystemController@weather');
     });
 
     // 需要登录的路由

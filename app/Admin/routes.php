@@ -52,4 +52,7 @@ Route::group([
     $router->get('harassMobile', 'HarassMobileController@index');
     $router->post('harassMobile', 'HarassMobileController@harassMobile');
 
+    // 系统
+    $router->get('system/aboutUs', 'SystemController@aboutUs');
+    $router->post('system/aboutUs', 'SystemController@storeAboutUs');
 });
