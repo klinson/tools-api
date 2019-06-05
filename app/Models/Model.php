@@ -17,4 +17,9 @@ class Model extends EloquentModel
     {
         return $query->orderBy('sort', 'desc');
     }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

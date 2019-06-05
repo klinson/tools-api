@@ -44,6 +44,8 @@ $api->version('v1', [
 
         // 论坛
         $api->get('postCategories', 'PostsController@categories');
+        $api->get('posts', 'PostsController@index');
+        $api->get('posts/{post}', 'PostsController@show')->where('post', '[0-9]+');
 
     });
 
@@ -52,6 +54,11 @@ $api->version('v1', [
         'middleware' => 'refresh.token'
     ], function ($api) {
         $api->put('user', 'UserController@update');
+
+        // 论坛
+        $api->post('posts', 'PostsController@store');
+        $api->put('posts/{post}', 'PostsController@update')->where('post', '[0-9]+');
+        $api->delete('posts/{post}', 'PostsController@destroy')->where('post', '[0-9]+');
 
     });
 });

@@ -32,7 +32,7 @@ class UserTransformer extends TransformerAbstract
                         'nickname' => $model->nickname,
                         'name' => $model->name,
                         'sex' => $model->sex,
-                        'avatar' => $model->avatar,
+                        'avatar' => $model->avatar ?: asset('/images/avatar.png'),
                         'mobile' => $model->mobile,
                         'created_at' => $model->created_at->toDateTimeString(),
                     ],
