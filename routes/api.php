@@ -46,6 +46,7 @@ $api->version('v1', [
         $api->get('postCategories', 'PostsController@categories');
         $api->get('posts', 'PostsController@index');
         $api->get('posts/{post}', 'PostsController@show')->where('post', '[0-9]+');
+        $api->get('postComments', 'PostCommentsController@index');
 
     });
 
@@ -60,5 +61,7 @@ $api->version('v1', [
         $api->put('posts/{post}', 'PostsController@update')->where('post', '[0-9]+');
         $api->delete('posts/{post}', 'PostsController@destroy')->where('post', '[0-9]+');
 
+        $api->post('postComments/{post}', 'PostCommentsController@store')->where('post', '[0-9]+');
+        $api->delete('postComments/{comment}', 'PostCommentsController@destroy')->where('post', '[0-9]+');
     });
 });
