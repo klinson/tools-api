@@ -20,13 +20,14 @@ class PostsController extends Controller
     public function index(Request $request)
     {
         $query = Post::query();
+        $query->withCount('comments');
 
         $request->category_id && $query->where('category_id', $request->category_id);
         blank($request->q) || $query->where('title', 'like', '%'.$request->q.'%');
 
         $list = $query->top()->recent()->paginate($request->per_page);
 
-        return $this->response->paginator($list, new PostTransformer());
+        return $this->response->paginator($list, new PostTransformer('list'));
     }
 
     public function store(Request $request)
