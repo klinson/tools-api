@@ -10,6 +10,11 @@ class Post extends Model
 
     protected $fillable = ['title', 'category_id', 'content', 'images', 'address', 'point', 'user_id', 'is_top'];
 
+    public function scopeWitPoint($query)
+    {
+        return $query->select()->selectRaw('x(`point`) as point_x,y(`point`) as point_y');
+    }
+
     public function scopeTop($query)
     {
         return $query->orderBy('is_top', 'desc');
@@ -26,6 +31,19 @@ class Post extends Model
     {
         if (is_array($content)) {
             $this->attributes['images'] = json_encode($content);
+        }
+    }
+    public function getPointAttribute($content)
+    {
+        if (! is_array($content)) {
+            return [$this->getAttribute('point_x'), $this->getAttribute('point_y')];
+        }
+        return $content;
+    }
+    public function setPointAttribute($content)
+    {
+        if (is_array($content)) {
+            $this->attributes['point'] = \DB::raw("ST_GeomFromText ('POINT({$content[0]} {$content[1]})')");
         }
     }
 
