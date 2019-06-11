@@ -20,10 +20,19 @@ class PostsController extends Controller
     public function index(Request $request)
     {
         $query = Post::query();
-        $query->withCount('comments');
+        $query->select()->withPoint()->withCount('comments');
 
         $request->category_id && $query->where('category_id', $request->category_id);
         blank($request->q) || $query->where('title', 'like', '%'.$request->q.'%');
+
+        if ($request->point) {
+            if (is_array($request->point)) {
+                $point = $request->point;
+            } else {
+                $point = explode(',', $request->point);
+            }
+            $query->withDistance($point[0], $point[1]);
+        }
 
         $list = $query->top()->recent()->paginate($request->per_page);
 

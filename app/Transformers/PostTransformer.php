@@ -27,6 +27,7 @@ class PostTransformer extends TransformerAbstract
                 'images' => $model->images,
                 'address' => $model->address,
                 'point' => $model->point,
+                'point_distance' => $model->point_distance !== null ? intval($model->point_distance) : null,
                 'is_top' => $model->is_top,
                 'comments_count' => $model->comments_count,
                 'created_at' => $model->created_at->toDateTimeString(),

@@ -10,9 +10,14 @@ class Post extends Model
 
     protected $fillable = ['title', 'category_id', 'content', 'images', 'address', 'point', 'user_id', 'is_top'];
 
-    public function scopeWitPoint($query)
+    public function scopeWithPoint($query)
     {
-        return $query->select()->selectRaw('x(`point`) as point_x,y(`point`) as point_y');
+        return $query->selectRaw('x(`point`) as point_x,y(`point`) as point_y');
+    }
+
+    public function scopeWithDistance($query, $x, $y)
+    {
+        return $query->selectRaw("st_distance(`point`, Point({$x},{$y})) * 111195 as point_distance");
     }
 
     public function scopeTop($query)
