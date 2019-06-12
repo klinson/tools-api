@@ -34,6 +34,14 @@ class PostsController extends Controller
             $query->withDistance($point[0], $point[1]);
         }
 
+        if ($request->mine == 1) {
+            // 获取自己的
+            if (! Auth::check()) {
+                return $this->response->errorUnauthorized();
+            }
+            $query->mine();
+        }
+
         $list = $query->top()->recent()->paginate($request->per_page);
 
         return $this->response->paginator($list, new PostTransformer('list'));

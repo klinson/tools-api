@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Models\Post;
 use App\Models\PostComment;
 use App\Transformers\PostCommentTransformer;
-use App\Transformers\PostTransformer;
 use Illuminate\Http\Request;
 use Auth;
+use Illuminate\Support\Facades\Redis;
 
 class PostCommentsController extends Controller
 {
@@ -18,7 +18,12 @@ class PostCommentsController extends Controller
             $query->where('post_id', $request->post_id);
         } else {
             if (Auth::check()) {
-                $query->mine();
+                $query->where(function ($query) {
+                    $query->whereHas('post', function ($query) {
+                        $query->orWhere('user_id', Auth::id());
+                    });
+                    $query->orWhere('to_user_id', Auth::id());
+                });
             } else {
                 return $this->response->errorUnauthorized('用户未登录');
             }
@@ -62,6 +67,13 @@ class PostCommentsController extends Controller
     {
         $this->authorize('delete', $comment);
         $comment->delete();
+        return $this->response->noContent();
+    }
+
+    public function clearMessageCount()
+    {
+        $redis_key = 'klinson:user_comment_message_count';
+        Redis::hset($redis_key, Auth::id(), 0);
         return $this->response->noContent();
     }
 }
