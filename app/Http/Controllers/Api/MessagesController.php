@@ -9,7 +9,7 @@ class MessagesController extends Controller
     public function count()
     {
         $return = [
-            'comment_message_count' => Redis::hget('klinson:user_comment_message_count', Auth::id())
+            'comment_message_count' => Redis::hget('klinson:user_comment_message_count', \Auth::id())
         ];
         return $this->response->array($return);
     }

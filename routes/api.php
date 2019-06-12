@@ -65,7 +65,7 @@ $api->version('v1', [
         $api->delete('postComments/{comment}', 'PostCommentsController@destroy')->where('post', '[0-9]+');
         $api->delete('postComments/clearMessageCount', 'PostCommentsController@clearMessageCount');
 
-        $api->get('messages/count', 'PostsController@index');
+        $api->get('messages/count', 'MessagesController@count');
 
 
     });
