@@ -18,7 +18,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'wxapp_openid', 'nickname', 'sex', 'avatar', 'wechat_info'
+        'name', 'wxapp_openid', 'nickname', 'sex', 'avatar', 'wechat_info', 'signature', 'images'
     ];
 
     /**
@@ -28,6 +28,10 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $hidden = [
         'password', 'remember_token',
+    ];
+
+    protected $casts = [
+        'images' => 'array'
     ];
 
     /**

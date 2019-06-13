@@ -34,6 +34,8 @@ class UserTransformer extends TransformerAbstract
                         'sex' => $model->sex,
                         'avatar' => $model->avatar ?: asset('/images/avatar.png'),
                         'mobile' => $model->mobile,
+                        'signature' => $model->signature,
+                        'images' => $model->images ?: [],
                         'created_at' => $model->created_at->toDateTimeString(),
                     ],
                     'token' => $this->token,
@@ -48,6 +50,8 @@ class UserTransformer extends TransformerAbstract
                 'sex' => $model->sex,
                 'avatar' => $model->avatar,
                 'mobile' => $model->mobile,
+                'signature' => $model->signature,
+                'images' => $model->images ?: [],
                 'created_at' => $model->created_at,
             ];
         }

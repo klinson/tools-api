@@ -21,9 +21,11 @@ class UserController extends Controller
             'sex' => '性别',
             'mobile' => '手机号',
             'avatar' => '头像',
+            'signature' => '个性签名',
+            'images' => '个性照'
         ]);
 
-        Auth::user()->fill($request->only(['nickname', 'name', 'sex', 'mobile', 'avatar']));
+        Auth::user()->fill($request->only(['nickname', 'name', 'sex', 'mobile', 'avatar', 'signature', 'images']));
         Auth::user()->save();
         return $this->response->item(Auth::user(), new UserTransformer(''));
     }
