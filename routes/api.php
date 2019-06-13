@@ -55,6 +55,7 @@ $api->version('v1', [
         'middleware' => 'refresh.token'
     ], function ($api) {
         $api->put('user', 'UserController@update');
+        $api->post('user/updateLocation', 'UserController@updateLocation');
 
         // 论坛
         $api->post('posts', 'PostsController@store');

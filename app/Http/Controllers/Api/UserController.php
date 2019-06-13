@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\UserLocation;
+use App\Transformers\UserLocationTransformer;
 use App\Transformers\UserTransformer;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Auth;
+use Toin0u\Geotools\Facade\Geotools;
 
 class UserController extends Controller
 {
@@ -28,5 +32,26 @@ class UserController extends Controller
         Auth::user()->fill($request->only(['nickname', 'name', 'sex', 'mobile', 'avatar', 'signature', 'images']));
         Auth::user()->save();
         return $this->response->item(Auth::user(), new UserTransformer(''));
+    }
+
+    // 更新位置信息
+    public function updateLocation(Request $request)
+    {
+        if ($request->longitude && $request->latitude) {
+            $data = $request->only(['longitude', 'latitude', 'user_id', 'point']);
+            $data['user_id'] = Auth::id();
+            $data['point'] = \DB::raw("ST_GeomFromText ('POINT({$request->longitude} {$request->latitude})')");
+            $data['geohash'] = Geotools::geohash()->encode(Geotools::coordinate("{$request->longitude} {$request->latitude}"))->getGeohash();
+            $data['created_at'] = Carbon::now()->toDateTimeString();
+
+
+            $userLocation = UserLocation::updateOrCreate(
+                ['user_id' => Auth::id()],
+                $data
+            );
+            return $this->response->item($userLocation, new UserLocationTransformer());
+        } else {
+            return $this->response->errorBadRequest('位置更新失败，经度维度必须');
+        }
     }
 }
