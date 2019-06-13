@@ -23,7 +23,7 @@ class Model extends EloquentModel
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function mine($query)
+    public function scopeMine($query)
     {
         return $query->where('user_id', \Auth::id());
     }

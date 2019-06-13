@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Jobs\AddUserCommentMessageCount;
 use App\Models\Post;
 use App\Models\PostComment;
 use App\Transformers\PostCommentTransformer;
@@ -55,6 +56,8 @@ class PostCommentsController extends Controller
         $comment->user_id = Auth::id();
         $comment->save();
 
+        dispatch(new AddUserCommentMessageCount($comment));
+
         return $this->response->item($comment, new PostCommentTransformer());
     }
 
@@ -67,13 +70,6 @@ class PostCommentsController extends Controller
     {
         $this->authorize('delete', $comment);
         $comment->delete();
-        return $this->response->noContent();
-    }
-
-    public function clearMessageCount()
-    {
-        $redis_key = 'klinson:user_comment_message_count';
-        Redis::hset($redis_key, Auth::id(), 0);
         return $this->response->noContent();
     }
 }
