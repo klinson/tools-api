@@ -21,7 +21,7 @@ class UserLocationsTableSeeder extends Seeder
                 $data['latitude'] = $latitude;
                 $data['user_id'] = $user->id;
                 $data['point'] = \DB::raw("ST_GeomFromText ('POINT({$longitude} {$latitude})')");
-                $data['geohash'] = \Lvht\GeoHash::encode($longitude, $latitude);
+                $data['geohash'] = \Lvht\GeoHash::encode($longitude, $latitude, 0.000001);
 
                 $data['created_at'] = \Carbon\Carbon::now()->subHours(rand(0, 48))->toDateTimeString();
 

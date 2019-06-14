@@ -17,7 +17,8 @@ class FavoursController extends Controller
         $longitude = $request->longitude;
         $latitude = $request->latitude;
 
-        $geohash = GeoHash::encode($longitude, $latitude);
+        $geohash = GeoHash::encode($longitude, $latitude, 0.000001);
+//        dd($geohash);
         $geohash_perfix = substr($geohash, 0 ,2);
 //        $res = GeoHash::expand($geohash, 1);
 

@@ -41,7 +41,7 @@ class UserController extends Controller
             $data = $request->only(['longitude', 'latitude', 'user_id', 'point']);
             $data['user_id'] = Auth::id();
             $data['point'] = \DB::raw("ST_GeomFromText ('POINT({$request->longitude} {$request->latitude})')");
-            $data['geohash'] = GeoHash::encode($request->longitude, $request->latitude);
+            $data['geohash'] = GeoHash::encode($request->longitude, $request->latitude, 0.000001);
             $data['created_at'] = Carbon::now()->toDateTimeString();
 
             $userLocation = UserLocation::updateOrCreate(
