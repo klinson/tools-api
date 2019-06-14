@@ -18,7 +18,8 @@ class FavoursController extends Controller
         $latitude = $request->latitude;
 
         $geohash = GeoHash::encode($longitude, $latitude);
-        $res = GeoHash::expand($geohash, 1);
+        $geohash_perfix = substr($geohash, 0 ,2);
+//        $res = GeoHash::expand($geohash, 1);
 
         $favours = \DB::table('favours')->where('from_user_id', \Auth::id())->select('to_user_id')->get()->pluck('to_user_id')->toArray();
         $favours[] = \Auth::id();
@@ -30,8 +31,8 @@ class FavoursController extends Controller
 //            ->count();
 //        dd($count);
 
-        $users = User::with('location')->whereHas('location', function ($query) use ($res, $favours) {
-            $query->where('geohash', 'like', $res[0].'%')->whereNotIn('user_id', $favours);
+        $users = User::with('location')->whereHas('location', function ($query) use ($geohash_perfix, $favours) {
+            $query->where('geohash', 'like', $geohash_perfix.'%')->whereNotIn('user_id', $favours);
         })->limit(10)->get();
 
         return $this->response->collection($users, new UserTransformer('location', [
