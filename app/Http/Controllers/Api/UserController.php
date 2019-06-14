@@ -8,7 +8,7 @@ use App\Transformers\UserTransformer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Auth;
-use Toin0u\Geotools\Facade\Geotools;
+use Lvht\GeoHash;
 
 class UserController extends Controller
 {
@@ -41,9 +41,8 @@ class UserController extends Controller
             $data = $request->only(['longitude', 'latitude', 'user_id', 'point']);
             $data['user_id'] = Auth::id();
             $data['point'] = \DB::raw("ST_GeomFromText ('POINT({$request->longitude} {$request->latitude})')");
-            $data['geohash'] = Geotools::geohash()->encode(Geotools::coordinate("{$request->longitude} {$request->latitude}"))->getGeohash();
+            $data['geohash'] = GeoHash::encode($request->longitude, $request->latitude);
             $data['created_at'] = Carbon::now()->toDateTimeString();
-
 
             $userLocation = UserLocation::updateOrCreate(
                 ['user_id' => Auth::id()],

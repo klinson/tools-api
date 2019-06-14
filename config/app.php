@@ -179,7 +179,6 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Intervention\Image\ImageServiceProvider::class,
-        Toin0u\Geotools\GeotoolsServiceProvider::class,
     ],
 
     /*
@@ -230,7 +229,6 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
         'Image' => Intervention\Image\Facades\Image::class,
-        'Geotools' => Toin0u\Geotools\Facade\Geotools::class,
     ],
 
 ];
