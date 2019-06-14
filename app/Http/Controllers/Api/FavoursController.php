@@ -14,8 +14,6 @@ class FavoursController extends Controller
     // 附近未匹配人
     public function nearbyUsers(Request $request)
     {
-        $prefix = \DB::connection()->getConfig('prefix');
-
         $longitude = $request->longitude;
         $latitude = $request->latitude;
 
