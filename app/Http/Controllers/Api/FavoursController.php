@@ -7,7 +7,6 @@ use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 use Auth;
 use Lvht\GeoHash;
-use Toin0u\Geotools\Facade\Geotools;
 
 class FavoursController extends Controller
 {
@@ -22,9 +21,8 @@ class FavoursController extends Controller
         $geohash_perfix = substr($geohash, 0 ,2);
 //        $res = GeoHash::expand($geohash, 1);
 
-        $favours = \DB::table('favours')->where('from_user_id', \Auth::id())->select('to_user_id')->get()->pluck('to_user_id')->toArray();
-        $favours[] = \Auth::id();
-
+        $favours = \DB::table('favours')->where('from_user_id', Auth::id())->select('to_user_id')->get()->pluck('to_user_id')->toArray();
+        $favours[] = Auth::id();
 
 //        $count = \DB::table('user_locations')
 //            ->where('geohash', 'like', $res[0].'%')
