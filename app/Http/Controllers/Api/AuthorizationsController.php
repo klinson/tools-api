@@ -46,6 +46,7 @@ class AuthorizationsController extends Controller
                     'sex' => $info['gender'],
                     'avatar' => $info['avatarUrl'],
                     'wechat_info' => json_encode($info),
+                    'images' => [],
                 ]);
                 $user->save();
             } else {

@@ -19,5 +19,6 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminConfigTableSeeder::class);
         $this->call(WechatMenusTableSeeder::class);
         $this->call(PostCategoriesTableSeeder::class);
+        $this->call(UserLocationsTableSeeder::class);
     }
 }

@@ -21,6 +21,8 @@ $factory->define(App\Models\User::class, function (Faker $faker) {
         'avatar' => asset('images/avatar.png'),
         'sex' => $faker->randomKey([0, 1]),
         'wechat_info' => '{}',
+        'signature' => $faker->text(),
+        'images' => '[]',
         'created_at' => date('Y-m-d'),
         'updated_at' => date('Y-m-d'),
     ];

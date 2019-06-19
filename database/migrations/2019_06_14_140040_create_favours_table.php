@@ -17,7 +17,7 @@ class CreateFavoursTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('from_user_id')->default(0);
             $table->unsignedInteger('to_user_id')->default(0);
-            $table->unsignedInteger('is_favour')->default(0);
+            $table->unsignedInteger('is_favoured')->default(0);
             $table->timestamps();
         });
     }

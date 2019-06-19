@@ -43,16 +43,17 @@ class UserTransformer extends TransformerAbstract
                 ];
                 break;
             case 'location':
+                $avatar = $model->avatar ?: asset('/images/avatar.png');
                 return [
                     'id' => $model->id,
                     'wxapp_openid' => $model->wxapp_openid,
                     'nickname' => $model->nickname,
                     'name' => $model->name,
                     'sex' => $model->sex,
-                    'avatar' => $model->avatar ?: asset('/images/avatar.png'),
+                    'avatar' => $avatar,
                     'mobile' => $model->mobile,
                     'signature' => $model->signature,
-                    'images' => $model->images ?: [],
+                    'images' => $model->images ?: [$avatar],
                     'created_at' => $model->created_at->toDateTimeString(),
                     // 距离字段
                     'distance' => get_distance(

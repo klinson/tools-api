@@ -70,6 +70,7 @@ $api->version('v1', [
 
         $api->get('messages/count', 'MessagesController@count');
 
-
+        $api->post('favour/{user}', 'FavoursController@favour');
+        $api->post('unfavour/{user}', 'FavoursController@unfavour');
     });
 });

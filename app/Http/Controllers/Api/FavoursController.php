@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Transformers\FavourTransformer;
 use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 use Auth;
@@ -48,11 +49,13 @@ class FavoursController extends Controller
 
     public function favour(User $user)
     {
-
+        $favour = Auth::user()->favour($user);
+        return $this->response->item($favour, new FavourTransformer());
     }
 
     public function unfavour(User $user)
     {
-
+        $favour = Auth::user()->favour($user, false);
+        return $this->response->item($favour, new FavourTransformer());
     }
 }

@@ -71,5 +71,12 @@ class User extends Authenticatable implements JWTSubject
      */
     public function favour($user, $favour = true)
     {
+        $favour = Favour::updateOrCreate([
+            'from_user_id' => $this->id,
+            'to_user_id' => $user->id
+        ], [
+            'is_favoured' => $favour ? 1 : 0
+        ]);
+        return $favour;
     }
 }
