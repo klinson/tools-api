@@ -46,4 +46,13 @@ class FavoursController extends Controller
         ]));
     }
 
+    public function favour(User $user)
+    {
+
+    }
+
+    public function unfavour(User $user)
+    {
+
+    }
 }
