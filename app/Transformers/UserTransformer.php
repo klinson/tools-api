@@ -18,6 +18,7 @@ class UserTransformer extends TransformerAbstract
 
     public function transform(Model $model)
     {
+        $avatar = $model->avatar ?: asset('/images/avatar_'.$model->sex.'.png');
         switch ($this->token) {
             case '':
                 return [
@@ -26,7 +27,7 @@ class UserTransformer extends TransformerAbstract
                     'nickname' => $model->nickname,
                     'name' => $model->name,
                     'sex' => $model->sex,
-                    'avatar' => $model->avatar,
+                    'avatar' => $avatar,
                     'mobile' => $model->mobile,
                     'signature' => $model->signature,
                     'images' => $model->images ?: [],
@@ -39,11 +40,10 @@ class UserTransformer extends TransformerAbstract
                     'wxapp_openid' => $model->wxapp_openid,
                     'nickname' => $model->nickname,
                     'sex' => $model->sex,
-                    'avatar' => $model->avatar,
+                    'avatar' => $avatar,
                 ];
                 break;
             case 'location':
-                $avatar = $model->avatar ?: asset('/images/avatar.png');
                 return [
                     'id' => $model->id,
                     'wxapp_openid' => $model->wxapp_openid,
@@ -72,10 +72,10 @@ class UserTransformer extends TransformerAbstract
                         'nickname' => $model->nickname,
                         'name' => $model->name,
                         'sex' => $model->sex,
-                        'avatar' => $model->avatar ?: asset('/images/avatar.png'),
+                        'avatar' => $avatar,
                         'mobile' => $model->mobile,
                         'signature' => $model->signature,
-                        'images' => $model->images ?: [],
+                        'images' => $model->images ?: [$avatar],
                         'created_at' => $model->created_at->toDateTimeString(),
                     ],
                     'token' => $this->token,
