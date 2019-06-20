@@ -65,6 +65,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * 我喜欢或不喜欢对方
      * @param $user
      * @param bool $favour
      * @author klinson <klinson@163.com>
@@ -78,5 +79,15 @@ class User extends Authenticatable implements JWTSubject
             'is_favoured' => $favour ? 1 : 0
         ]);
         return $favour;
+    }
+
+    // 对方已经喜欢我
+    public function isFavourMe($user)
+    {
+        if (Favour::where('from_user_id', $user->id)->where('to_user_id', $this->id)->where('is_favoured', 1)->count()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

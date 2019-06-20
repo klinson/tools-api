@@ -49,13 +49,25 @@ class FavoursController extends Controller
 
     public function favour(User $user)
     {
-        $favour = Auth::user()->favour($user);
-        return $this->response->item($favour, new FavourTransformer());
+        Auth::user()->favour($user);
+        if (Auth::user()->isFavourMe($user)) {
+            // 成为组合
+            // TODO: 创建聊天室
+            return $this->response->array([
+                'is_coupled' => 1,
+            ]);
+        } else {
+            return $this->response->array([
+                'is_coupled' => 0,
+            ]);
+        }
     }
 
     public function unfavour(User $user)
     {
-        $favour = Auth::user()->favour($user, false);
-        return $this->response->item($favour, new FavourTransformer());
+        Auth::user()->favour($user, false);
+        return $this->response->array([
+            'is_coupled' => 0,
+        ]);
     }
 }
