@@ -14,12 +14,13 @@ use Faker\Generator as Faker;
 */
 
 $factory->define(App\Models\User::class, function (Faker $faker) {
+    $sex = $faker->randomElement([1, 2]);
     return [
         'wxapp_openid' => str_random(50),
         'nickname' => str_random(10),
         'name' => $faker->name,
-        'avatar' => asset('images/avatar.png'),
-        'sex' => $faker->randomKey([0, 1]),
+        'avatar' => asset('images/avatar_'.$sex.'.png'),
+        'sex' => $sex,
         'wechat_info' => '{}',
         'signature' => $faker->text(),
         'images' => '[]',
