@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\ChatRoom;
 use App\Models\User;
 use App\Transformers\FavourTransformer;
 use App\Transformers\UserTransformer;
@@ -52,9 +53,18 @@ class FavoursController extends Controller
         Auth::user()->favour($user);
         if (Auth::user()->isFavourMe($user)) {
             // 成为组合
-            // TODO: 创建聊天室
+            // 创建聊天室
+            $room = ChatRoom::createC2C(Auth::user(), $user);
             return $this->response->array([
                 'is_coupled' => 1,
+                'chat_room_id' => $room->id,
+                'to_user' => [
+                    'id' => $user->id,
+                    'wxapp_openid' => $user->wxapp_openid,
+                    'nickname' => $user->nickname,
+                    'sex' => $user->sex,
+                    'avatar' => $user->avatar ?: asset('/images/avatar_'.$user->sex.'.png'),
+                ]
             ]);
         } else {
             return $this->response->array([

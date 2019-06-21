@@ -17,6 +17,8 @@ class CreateChatRoomHasUsersTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('chat_room_id')->default(0);
             $table->unsignedInteger('user_id')->default(0);
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
