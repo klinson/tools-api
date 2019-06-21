@@ -25,8 +25,13 @@ class UsersTableSeeder extends Seeder
 
         // 单独处理几个用户的数据
         $user = User::find(1);
+        $user->wxapp_openid = 'oGfri5AXoXORAWxVMSRS7qdnJEBA';
         $user->name = 'klinson';
+        $user->sex = 1;
         $user->nickname = 'klinson';
+        $user->avatar = 'https://wx.qlogo.cn/mmopen/vi_32/ZxZRZWq5o7173DQ2pccYaZcsgzvT9bHeKsWMD48u3cDwUvMdaKEwyp6lZwLmeG0JpicjM33ibVLCogGdDZK2lIZQ/132';
+        $user->wechat_info = '{"city": "Dongguan", "gender": 1, "country": "China", "language": "zh_CN", "nickName": "klinson", "province": "Guangdong", "avatarUrl": "https://wx.qlogo.cn/mmopen/vi_32/ZxZRZWq5o7173DQ2pccYaZcsgzvT9bHeKsWMD48u3cDwUvMdaKEwyp6lZwLmeG0JpicjM33ibVLCogGdDZK2lIZQ/132"}';
+
         $user->save();
     }
 }

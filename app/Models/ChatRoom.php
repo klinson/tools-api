@@ -10,6 +10,7 @@ class ChatRoom extends Model
 
     protected $fillable = ['create_user_id', 'owner_user_id', 'title', 'announcement', 'type'];
 
+    // 用户私聊创建房间
     public static function createC2C($fromUser, $toUser)
     {
         $room = new static([
@@ -36,7 +37,7 @@ class ChatRoom extends Model
     {
         return $this->hasMany(ChatRoomHasUser::class, 'chat_room_id', 'id');
     }
-    
+
     public function toUser()
     {
         return $this->users()->where('id', '<>', \Auth::id());
