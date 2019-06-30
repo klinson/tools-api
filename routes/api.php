@@ -72,5 +72,8 @@ $api->version('v1', [
 
         $api->post('favour/{user}', 'FavoursController@favour');
         $api->post('unfavour/{user}', 'FavoursController@unfavour');
+
+        $api->get('friends', 'FriendsController@index');
+
     });
 });
