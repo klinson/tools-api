@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\ChatRoom;
+use App\Models\Friend;
 use App\Models\User;
 use App\Transformers\FavourTransformer;
 use App\Transformers\UserTransformer;
@@ -53,6 +54,7 @@ class FavoursController extends Controller
         Auth::user()->favour($user);
         if (Auth::user()->isFavourMe($user)) {
             // 成为组合
+            Friend::toBeFriend(Auth::user(), $user);
             // 创建聊天室
             $room = ChatRoom::createC2C(Auth::user(), $user);
             return $this->response->array([
