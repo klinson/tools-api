@@ -13,14 +13,30 @@ class Friend extends Model
     {
         \DB::transaction(function () use ($user, $author) {
             static::firstOrCreate([
-                'user_id' => $user->id,
-                'friend_id' => $author->id
+                'user_id' => is_object($user) ? $user->id : $user,
+                'friend_id' => is_object($author) ? $author->id : $author
             ]);
             static::firstOrCreate([
-                'user_id' => $author->id,
-                'friend_id' => $user->id
+                'user_id' => is_object($author) ? $author->id : $author,
+                'friend_id' => is_object($user) ? $user->id : $user,
             ]);
         });
+    }
+
+    public static function isFriend($user, $author)
+    {
+        return static::where([
+                'user_id' => is_object($user) ? $user->id : $user,
+                'friend_id' => is_object($author) ? $author->id : $author
+            ])->first() && static::where([
+                'user_id' => is_object($author) ? $author->id : $author,
+                'friend_id' => is_object($user) ? $user->id : $user,
+            ])->first();
+    }
+
+    public function isThisFriend($user)
+    {
+        return (is_object($user) ? $user->id : $user) == $this->user_id;
     }
 
     public function friend()

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\ChatRoom;
+use App\Models\Friend;
 use App\Transformers\ChatRoomTransformer;
 use Illuminate\Http\Request;
 use Auth;
@@ -26,7 +27,17 @@ class ChatRoomsController extends Controller
         if ($request->room_id) {
             $room = ChatRoom::find($request->room_id);
         } else if ($request->friend_id) {
-            $room = ChatRoom::getRoom(\Auth::user(), $request->friend_id);
+            $friend = Friend::find($request->friend_id);
+            if (empty($friend) || ! $friend->isThisFriend(\Auth::user())) {
+                return $this->response->errorBadRequest('与其不是好友关系，请刷新');
+            }
+            $room = ChatRoom::createC2C(\Auth::user(), $friend->friend_id);
+//        } else if ($request->friend_user_id) {
+//            if (Friend::isFriend(\Auth::user(), $request->friend_user_id)) {
+//                $room = ChatRoom::createC2C(\Auth::user(), $request->friend_user_id);
+//            } else {
+//                return $this->response->errorBadRequest('与其不是好友关系，请刷新');
+//            }
         } else {
             $room = null;
         }

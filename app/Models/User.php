@@ -91,8 +91,4 @@ class User extends Authenticatable implements JWTSubject
         }
     }
 
-    public function friendship($friend)
-    {
-
-    }
 }

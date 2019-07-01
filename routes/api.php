@@ -77,7 +77,10 @@ $api->version('v1', [
 
         $api->get('friends', 'FriendsController@index');
         $api->get('chatRooms', 'ChatRoomsController@index');
-        $api->get('chatRoom', 'ChatRoomsController@');
+        $api->get('chatRoom', 'ChatRoomsController@show');
+        $api->get('chatRooms/{room}/messages', 'ChatRoomMessagesController@index');
+        $api->post('chatRooms/{room}/messages', 'ChatRoomMessagesController@store');
+
         $api->get('friends/{friend}', 'FriendsController@show')->where('friend', '[0-9]+');
 
     });

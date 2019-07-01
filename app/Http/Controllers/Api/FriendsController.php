@@ -15,7 +15,10 @@ class FriendsController extends Controller
         $query = Friend::with('friend')->where('user_id', \Auth::id())->orderBy('alias');
         if ($request->q) {
             $query->where(function ($query) use ($request) {
-                $query->where('alias', 'like', $request->q);
+                $query->whereHas('friend', function ($query) use ($request) {
+                    $query->where('nickname', 'like', $request->q);
+                });
+                $query->orWhere('alias', 'like', $request->q);
             });
         }
 
