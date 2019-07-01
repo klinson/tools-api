@@ -6,7 +6,6 @@ use App\Models\ChatRoom;
 use App\Transformers\ChatRoomTransformer;
 use Illuminate\Http\Request;
 use Auth;
-use Illuminate\Support\Facades\Redis;
 
 class ChatRoomsController extends Controller
 {
@@ -17,9 +16,25 @@ class ChatRoomsController extends Controller
             $query->where('user_id', Auth::id());
         });
 
-        $list = $query->recent()->paginate($request->per_page);
+        $list = $query->recent()->get();
 
         return $this->response->paginator($list, new ChatRoomTransformer());
+    }
+
+    public function getRoom(Request $request)
+    {
+        if ($request->room_id) {
+            $room = ChatRoom::find($request->room_id);
+        } else if ($request->friend_id) {
+            $room = ChatRoom::getRoom(\Auth::user(), $request->friend_id);
+        } else {
+            $room = null;
+        }
+        if (! $room) {
+            return $this->response->errorBadRequest('房间不存在');
+        }
+
+        return $this->response->item($room, new ChatRoomTransformer());
     }
 
 }

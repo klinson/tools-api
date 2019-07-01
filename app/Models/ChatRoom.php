@@ -12,11 +12,14 @@ class ChatRoom extends Model
 
     public static function getRoom($user, $author)
     {
+        if (empty($user) && empty($author)) {
+            return null;
+        }
         $room = ChatRoom::where('type', 1)
             ->whereHas('hasUsers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
+                $query->where('user_id', is_object($user) ? $user->id : $user);
             })->whereHas('hasUsers', function ($query) use ($author) {
-                $query->where('user_id', $author->id);
+                $query->where('user_id', is_object($author) ? $author->id : $author);
             })->first();
         return $room;
     }
