@@ -30,8 +30,19 @@ class UserTransformer extends TransformerAbstract
                     'avatar' => $avatar,
                     'mobile' => $model->mobile,
                     'signature' => $model->signature,
-                    'images' => $model->images ?: [],
+                    'images' => $model->images ?: [$avatar],
                     'created_at' => $model->created_at,
+                ];
+                break;
+            case 'friend':
+                return [
+                    'id' => $model->id,
+                    'wxapp_openid' => $model->wxapp_openid,
+                    'nickname' => $model->nickname,
+                    'sex' => $model->sex,
+                    'avatar' => $avatar,
+                    'signature' => $model->signature,
+                    'images' => $model->images ?: [$avatar],
                 ];
                 break;
             case 'simple':

@@ -76,6 +76,8 @@ $api->version('v1', [
         $api->post('unfavour/{user}', 'FavoursController@unfavour');
 
         $api->get('friends', 'FriendsController@index');
+        $api->get('chatRooms', 'ChatRoomsController@index');
+        $api->get('chatRoom', 'ChatRoomsController@show');
 
     });
 });

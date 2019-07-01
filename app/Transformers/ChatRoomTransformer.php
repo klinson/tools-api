@@ -7,6 +7,8 @@ use App\Models\ChatRoom as Model;
 
 class ChatRoomTransformer extends TransformerAbstract
 {
+    protected $availableIncludes = ['toUser'];
+
     public function __construct()
     {
     }
@@ -23,5 +25,10 @@ class ChatRoomTransformer extends TransformerAbstract
             'created_at' => $model->created_at->toDateTimeString(),
             'updated_at' => $model->updated_at->toDateTimeString(),
         ];
+    }
+
+    public function includeToUser(Model $model)
+    {
+        return $this->item($model->toUser[0], new UserTransformer('friend'));
     }
 }

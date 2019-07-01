@@ -57,11 +57,11 @@ class ChatRoom extends Model
 
     public function toUser()
     {
-        return $this->users()->where('id', '<>', \Auth::id());
+        return $this->users()->where('users.id', '<>', \Auth::id());
     }
 
     public function users()
     {
-        return $this->belongsToMany('chat_room_has_users', User::class, 'chat_room_id', 'user_id');
+        return $this->belongsToMany(User::class,'chat_room_has_users', 'chat_room_id', 'user_id');
     }
 }

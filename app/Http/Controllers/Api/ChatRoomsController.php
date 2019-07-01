@@ -18,10 +18,10 @@ class ChatRoomsController extends Controller
 
         $list = $query->recent()->get();
 
-        return $this->response->paginator($list, new ChatRoomTransformer());
+        return $this->response->collection($list, new ChatRoomTransformer());
     }
 
-    public function getRoom(Request $request)
+    public function show(Request $request)
     {
         if ($request->room_id) {
             $room = ChatRoom::find($request->room_id);
