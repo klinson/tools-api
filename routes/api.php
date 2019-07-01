@@ -49,6 +49,8 @@ $api->version('v1', [
         $api->get('postComments', 'PostCommentsController@index');
 
         $api->get('nearbyUsers', 'FavoursController@nearbyUsers');
+        $api->get('users/{user}', 'UsersController@show')->where('user', '[0-9]+');
+
     });
 
     // 需要登录的路由
