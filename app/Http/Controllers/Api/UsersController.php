@@ -9,6 +9,6 @@ class UsersController extends Controller
 {
     public function show(User $user)
     {
-        return $this->response->item($user, new UserTransformer('friend'));
+        return $this->response->item($user, new UserTransformer('simple'));
     }
 }

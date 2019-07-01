@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\ChatRoom;
 use App\Models\Friend;
-use App\Models\User;
-use App\Transformers\FavourTransformer;
-use App\Transformers\UserTransformer;
+use App\Transformers\FriendTransformer;
 use Illuminate\Http\Request;
 use Auth;
 use Lvht\GeoHash;
@@ -54,4 +51,10 @@ class FriendsController extends Controller
        ];
     }
 
+    public function show(Friend $friend)
+    {
+        $this->authorize('is-mine', $friend);
+
+        return $this->response->item($friend, new FriendTransformer());
+    }
 }
