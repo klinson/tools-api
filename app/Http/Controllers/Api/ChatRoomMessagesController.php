@@ -19,6 +19,10 @@ class ChatRoomMessagesController extends Controller
 
         $messages = $query->get();
 
+        if ($messages->isNotEmpty()) {
+            $messages = $messages->sortBy('id');
+        }
+
         return $this->response->collection($messages, new ChatMessageTransformer());
     }
 
