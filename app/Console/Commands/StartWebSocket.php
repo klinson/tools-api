@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Handlers\WebSocketHandler;
 use App\Models\User;
 use Illuminate\Console\Command;
 
@@ -12,7 +13,7 @@ class StartWebSocket extends Command
      *
      * @var string
      */
-    protected $signature = 'web-socket:start';
+    protected $signature = 'websocket:start';
 
     /**
      * The console command description.
@@ -38,6 +39,11 @@ class StartWebSocket extends Command
      */
     public function handle()
     {
+        $server = new WebSocketHandler();
+//        $server->open(function ($server, $request) {
+//            $this->info('No.'.$request->fd.'接入');
+//        });
 
+        $server->start();
     }
 }
