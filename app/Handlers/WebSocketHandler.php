@@ -7,20 +7,29 @@
  */
 
 namespace App\Handlers;
+use App\Models\User;
+use Illuminate\Support\Facades\Redis;
 use \Swoole\WebSocket\Server as WebSocket;
+use \Swoole\Http\Request as Request;
+use \Auth;
 
 class WebSocketHandler
 {
     protected $server;
+    protected $redis;
     protected $config = [
         'host' => '0.0.0.0',
         'port' => 10901
     ];
-    const unauthorized_code = 401;
-    const fd_not_found = 404;
+    const success_code = 4200;
+    const unauthorized_code = 4401;
+    const too_many_clients_login_code = 4402;
+    const fd_not_found_code = 4404;
     const messages = [
+        self::success_code => 'success',
         self::unauthorized_code => 'unauthorized',
-        self::fd_not_found => 'fd not found',
+        self::too_many_clients_login_code => 'too_many_clients_login',
+        self::fd_not_found_code => 'fd not found',
     ];
 
     public function __construct($config = [])
@@ -28,13 +37,156 @@ class WebSocketHandler
         $this->config = array_merge($this->config, config('websocket', []), $config);
         $this->server = new WebSocket($this->config['host'], $this->config['port']);
 
+        $this->server->set([
+            'max_conn' => $this->config['max_connections'],
+        ]);
         $this->server->on('open', [$this, 'onOpen']);
         $this->server->on('message', [$this, 'onMessage']);
         $this->server->on('close', [$this, 'onClose']);
+
+        $this->redis = Redis::connection($this->config['redis']['connection']);
+        // 清空旧的连接
+        $this->redis->del([$this->getUid2FdKey(), $this->getFd2UidKey()]);
+    }
+
+    public function onOpen(WebSocket $server, Request $request)
+    {
+        //TODO: 验证header->Authorization验证登录
+        $token = $request->get['_token'];
+        $this->log('connecting', "fd{$request->fd}[{$token}]开始连接");
+
+        if ($user = $this->checkToken($token)) {
+            $this->login($request->fd, $user);
+            $this->log('connected', "fd{$request->fd}连接成功");
+            $this->pushInfo($request->fd, self::success_code);
+        } else {
+            // 未登录或者token不合法进行断开，已登录的进行记录
+            $this->disconnect($request->fd, self::unauthorized_code);
+        }
+    }
+
+    public function onMessage(WebSocket $server, $frame)
+    {
+//        var_dump($server);
+//        var_dump($frame);
+        $this->log('receive', "fd{$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}");
+        $this->pushData($frame->fd, [
+            $frame->data,
+            $this->getUser($frame->fd),
+        ]);
+    }
+
+    public function onClose(WebSocket $server, $fd)
+    {
+        // 清除系统记录的fd登录信息
+        $this->logout($fd);
+        $this->log('close', "fd{$fd}关闭连接");
+    }
+
+    protected function disconnect($fd, $code)
+    {
+        if ($this->server->isEstablished($fd)) {
+            $this->pushInfo($fd, $code);
+            $this->server->disconnect($fd, $code, self::messages[$code]);
+        }
+        $this->logout($fd);
+        $this->log('disconnect', "fd{$fd}断开连接[code={$code}]");
+    }
+
+    // 统一推送消息
+    public function push($fd, $content, $throwError = false)
+    {
+        $content = json_encode($content);
+        $this->log('pushing', "fd{$fd}:{$content}");
+
+        if ($this->server->isEstablished($fd)) {
+            $this->server->push($fd, $content);
+            $this->log('pushed', "fd{$fd}");
+            return true;
+        }
+        $this->log('push-fail', "fd{$fd}不存在");
+        $this->logout($fd);
+
+        if ($throwError) {
+            throw new \Exception(self::messages[self::fd_not_found_code], self::fd_not_found_code);
+        }
+        return false;
+    }
+
+    // 推送通知类消息
+    public function pushInfo($fd, $code)
+    {
+        $content = [
+            'code' => $code,
+            'message' => self::messages[$code],
+        ];
+        return $this->push($fd, $content, false);
+    }
+
+    public function pushData($fd, $data = [])
+    {
+        $content = [
+            'code' => self::success_code,
+            'message' => self::messages[self::success_code],
+            'data' => $data,
+        ];
+        return $this->push($fd, $content, false);
+    }
+
+    /**
+     * 验证登录token
+     * @param string $token
+     * @author klinson <klinson@163.com>
+     * @return bool|User
+     */
+    protected function checkToken($token)
+    {
+        if (empty($token)) {
+            return false;
+        }
+        if (! Auth::setToken($token)->check()) {
+            return false;
+        }
+        return Auth::user();
+    }
+
+    /**
+     * 获取当前用户
+     * @param $fd
+     * @author klinson <klinson@163.com>
+     * @return null|User
+     */
+    protected function getUser($fd)
+    {
+        if ($uid = $this->redis->hget($this->getFd2UidKey(), $fd)) {
+            return User::find($uid);
+        }
+        return null;
+    }
+
+    // 注册在线
+    protected function login($fd, $user)
+    {
+        // 清除旧的fd信息
+        if ($old_fd = $this->redis->hget($this->getUid2FdKey(), $user->id)) {
+            $this->disconnect($old_fd, self::too_many_clients_login_code);
+        }
+        $this->redis->hset($this->getUid2FdKey(), $user->id, $fd);
+        $this->redis->hset($this->getFd2UidKey(), $fd, $user->id);
+    }
+
+    // 删除会话
+    protected function logout($fd)
+    {
+        if ($uid = $this->redis->hget($this->getFd2UidKey(), $fd)) {
+            $this->redis->hdel($this->getUid2FdKey(), $uid);
+            $this->redis->hdel($this->getFd2UidKey(), $fd);
+        }
     }
 
     public function start()
     {
+        $this->log('start', 'websocket启动');
         $this->server->start();
     }
 
@@ -56,47 +208,21 @@ class WebSocketHandler
         return $this;
     }
 
-    public function onOpen(WebSocket $server, $request)
+    public function log($state, $info, ...$data)
     {
-        //TODO: 验证header->Authorization验证登录
-//        var_dump($request);
-
-        //TODO: 未登录进行断开，已登录的进行记录
-//        $this->disconnect($request->fd, self::unauthorized_code);
-
-        echo "server: handshake success with fd{$request->fd}\n";
-    }
-
-    public function onMessage(WebSocket $server, $frame)
-    {
-        var_dump($server);
-        var_dump($frame);
-        echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
-        $this->push($frame->fd, 'xxxxx');
-    }
-
-    public function onClose(WebSocket $server, $fd)
-    {
-        // TODO: 清除系统记录的fd列表
-        var_dump($server);
-        var_dump($fd);
-        echo "client {$fd} closed\n";
-    }
-
-    protected function disconnect($fd, $code)
-    {
-        $this->server->disconnect($fd, $code, self::messages[$code]);
-    }
-
-    public function push($fd, $content, $throwError = false)
-    {
-        if ($this->server->isEstablished($fd)) {
-            $this->server->push($fd, $content);
-            return true;
+        echo "[".date('Ymd H:i:s')."][{$state}] {$info}\n";
+        if ($data) {
+            print_r($data);
         }
-        if ($throwError) {
-            throw new \Exception(self::messages[self::fd_not_found], self::fd_not_found);
-        }
-        return false;
+    }
+
+    protected function getUid2FdKey()
+    {
+        return $this->config['redis']['uid2fd_key'];
+    }
+
+    protected function getFd2UidKey()
+    {
+        return $this->config['redis']['fd2uid_key'];
     }
 }
