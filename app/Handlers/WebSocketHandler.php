@@ -7,6 +7,7 @@
  */
 
 namespace App\Handlers;
+use App\Models\ChatRoom;
 use App\Models\User;
 use Illuminate\Support\Facades\Redis;
 use \Swoole\WebSocket\Server as WebSocket;
@@ -51,7 +52,7 @@ class WebSocketHandler
 
     public function onOpen(WebSocket $server, Request $request)
     {
-        //TODO: 验证header->Authorization验证登录
+        //获取get->_token验证登录
         $token = $request->get['_token'];
         $this->log('connecting', "fd{$request->fd}[{$token}]开始连接");
 
@@ -70,10 +71,37 @@ class WebSocketHandler
 //        var_dump($server);
 //        var_dump($frame);
         $this->log('receive', "fd{$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}");
-        $this->pushData($frame->fd, [
-            $frame->data,
-            $this->getUser($frame->fd),
-        ]);
+        try {
+            $data = json_decode($frame->data, true);
+            $this->handleMessage($data);
+        } catch (\Exception $exception) {
+            $this->log('message', "fd{$frame->fd}处理消息异常:{$exception->getMessage()}[code={$exception->getCode()}][line={$exception->getFile()}:{$exception->getLine()}]");
+        }
+    }
+
+    protected function handleMessage($data)
+    {
+        switch ($data['api']) {
+            // 接收聊天消息进行转发同聊天室的人
+            case 'chat_message':
+                $room = ChatRoom::find($data['data']['chat_room_id']);
+                foreach ($room->users as $user) {
+                    if ($user->id == $data['from_user_id']) {
+                        continue;
+                    }
+                    if ($fd = $this->getFd($user->id)) {
+                        // 在线的进行推送
+                        if ($this->pushData($fd, $data)) {
+                            // 成功就结束
+                            continue;
+                        }
+                    }
+                    // 不在线进入离线库
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     public function onClose(WebSocket $server, $fd)
@@ -100,9 +128,13 @@ class WebSocketHandler
         $this->log('pushing', "fd{$fd}:{$content}");
 
         if ($this->server->isEstablished($fd)) {
-            $this->server->push($fd, $content);
-            $this->log('pushed', "fd{$fd}");
-            return true;
+            if ($this->server->push($fd, $content)) {
+                $this->log('pushed-success', "fd{$fd}");
+                return true;
+            } else {
+                $this->log('pushed-fail', "fd{$fd}");
+                return false;
+            }
         }
         $this->log('push-fail', "fd{$fd}不存在");
         $this->logout($fd);
@@ -162,6 +194,21 @@ class WebSocketHandler
             return User::find($uid);
         }
         return null;
+    }
+
+    /**
+     * 根据uid获取fd
+     * @param $uid
+     * @author klinson <klinson@163.com>
+     * @return bool
+     */
+    protected function getFd($uid)
+    {
+        $fd = $this->redis->hget($this->getUid2FdKey(), $uid);
+        if ($this->server->isEstablished($fd)) {
+            return $fd;
+        }
+        return false;
     }
 
     // 注册在线
