@@ -53,7 +53,11 @@ class WebSocketHandler
     public function onOpen(WebSocket $server, Request $request)
     {
         //获取get->_token验证登录
-        $token = $request->get['_token'];
+        if (isset($request->get['_token'])) {
+            $token = $request->get['_token'];
+        } else {
+            $token = '';
+        }
         $this->log('connecting', "fd{$request->fd}[{$token}]开始连接");
 
         if ($user = $this->checkToken($token)) {
@@ -79,14 +83,44 @@ class WebSocketHandler
         }
     }
 
+    /**
+     * @param $data
+     *
+     * @author klinson <klinson@163.com>
+     */
     protected function handleMessage($data)
     {
         switch ($data['api']) {
             // 接收聊天消息进行转发同聊天室的人
             case 'chat_message':
+                /*
+                $json_data = <<<JSON
+{
+    "api": "chat_message",
+    "data": {
+        "id": 0,
+        "chat_room_id": 1,
+        "from_user_id": 2,
+        "to_user_id": null,
+        "content": "hello, this is test websocket message",
+        "type": "1",
+        "withdraw_at": null,
+        "created_at": "2019-07-14 22:20:45",
+        "fromUser": {
+            "id": 1,
+            "wxapp_openid": "oGfri5AXoXORAWxVMSRS7qdnJEBA",
+            "nickname": "klinson",
+            "sex": 1,
+            "avatar": "https://wx.qlogo.cn/mmopen/vi_32/ZxZRZWq5o7173DQ2pccYaZcsgzvT9bHeKsWMD48u3cDwUvMdaKEwyp6lZwLmeG0JpicjM33ibVLCogGdDZK2lIZQ/132"
+        }
+    }
+}
+JSON;
+                $data = json_decode($json_data, true);
+*/
                 $room = ChatRoom::find($data['data']['chat_room_id']);
                 foreach ($room->users as $user) {
-                    if ($user->id == $data['from_user_id']) {
+                    if ($user->id == $data['data']['from_user_id']) {
                         continue;
                     }
                     if ($fd = $this->getFd($user->id)) {
