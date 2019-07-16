@@ -211,7 +211,9 @@ JSON;
             return false;
         }
         try {
-            $user = Auth::guard('api')->setToken($token)->authenticate();
+            $user_id = Auth::guard('api')->setToken($token)->getClaim('sub');
+            $user = User::findOrFail($user_id);
+            Auth::unsetToken();
             if ($user) {
                 return $user;
             }
