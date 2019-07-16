@@ -210,10 +210,10 @@ JSON;
         if (empty($token)) {
             return false;
         }
-        if (! Auth::setToken($token)->check()) {
-            return false;
+        if ($user = Auth::guard('api')->setToken($token)->authenticate()) {
+            return $user;
         }
-        return Auth::user();
+        return false;
     }
 
     /**
