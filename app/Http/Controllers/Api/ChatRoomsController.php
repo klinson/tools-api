@@ -17,7 +17,12 @@ class ChatRoomsController extends Controller
             $query->where('user_id', Auth::id());
         });
 
-        $list = $query->recent()->get();
+        $query->join('chat_messages', 'chat_messages.chat_room_id', '=', 'chat_rooms.id');
+        $query->distinct();
+        $query->select(['chat_rooms.*']);
+//        $query->select(['chat_rooms.*', 'chat_messages.created_at as message_created_at', 'chat_messages.content as message_content']);
+//        $query->orderBy('message_created_at', 'desc');
+        $list = $query->get();
 
         return $this->response->collection($list, new ChatRoomTransformer());
     }
