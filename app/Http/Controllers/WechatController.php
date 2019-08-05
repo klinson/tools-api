@@ -140,11 +140,17 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 7:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->form(file_get_contents($info['data']['PicUrl']));
+                                            $res = BaiduAIPHandler::getInstance('ocr')->tableRecognitionAsync(file_get_contents($info['data']['PicUrl']));
                                             $data = '';
-                                            if (! isset($res['error_code']) &&  $res['forms_result_num'] > 0) {
-                                                // TODO: ........
-                                                dd($res['forms_result']);
+                                            if (! isset($res['error_code']) &&  $res['result']) {
+                                                $res = BaiduAIPHandler::getInstance('ocr')->getTableRecognitionResult(file_get_contents($res['result']['request_id']), ['result_type' => 'json']);
+                                                LogHandler::log('wechat', 'debug', $res);
+                                                if (! isset($res['error_code']) &&  $res['result']) {
+                                                    // TODO: ........
+//                                                    dd($res['result']);
+                                                } else {
+                                                    $data = '识别失败，请稍后重试';
+                                                }
                                             } else {
                                                 $data = '识别失败，请稍后重试';
                                             }
