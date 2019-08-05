@@ -143,7 +143,7 @@ class WechatController extends Controller
                                             $res = BaiduAIPHandler::getInstance('ocr')->tableRecognitionAsync(file_get_contents($info['data']['PicUrl']));
                                             $data = '';
                                             if (! isset($res['error_code']) &&  $res['result']) {
-                                                $res = BaiduAIPHandler::getInstance('ocr')->getTableRecognitionResult(file_get_contents($res['result']['request_id']), ['result_type' => 'json']);
+                                                $res = BaiduAIPHandler::getInstance('ocr')->getTableRecognitionResult($res['result']['request_id'], ['result_type' => 'json']);
                                                 LogHandler::log('wechat', 'debug', $res);
                                                 if (! isset($res['error_code']) &&  $res['result']) {
                                                     // TODO: ........
