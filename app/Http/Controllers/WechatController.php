@@ -7,7 +7,9 @@
  */
 
 namespace App\Http\Controllers;
+use App\Handlers\BaiduAIPHandler;
 use App\Handlers\LogHandler;
+use App\Handlers\WechatMessageHandler;
 use App\Jobs\ReceiveWechatMessage;
 
 class WechatController extends Controller
@@ -39,11 +41,176 @@ class WechatController extends Controller
                 case 'text':
                     //{"ToUserName":"gh_f00d12a6807f","FromUserName":"o3l5Twydfo3yGJMLtqCDZdmVKkW8","CreateTime":"1543482671","MsgType":"text","Content":"999","MsgId":"6629207594310057452"}
                     dispatch(new ReceiveWechatMessage($message));
+
+                    if (is_numeric($message['Content'])) {
+                        $action_number = intval($message['Content']);
+                        // 数字事件
+                        $info = WechatMessageHandler::getInstance()->popMessage($message['FromUserName']);
+                        if ($info && isset($info['action'])) {
+                            switch ($info['action']) {
+                                case 'image':
+                                    /**
+                                    [1]：通用文字识别
+                                    [2]：通用文字识别（高精度版）
+                                    [3]：网络图片文字识别
+                                    [4]：身份证识别
+                                    [5]：银行卡识别
+                                    [6]：营业执照识别
+                                    [7]：表格文字识别
+                                    [8]：驾驶证识别
+                                    [9]：行驶证识别
+                                    [10]：车牌识别
+                                    [11]：通用票据识别
+                                    [12]：火车票识别
+                                     */
+                                    switch ($action_number) {
+                                        case 1:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->basicGeneralUrl($info['PicUrl'], [
+                                                'detect_direction' => true,
+                                                'detect_language' => true
+                                            ]);
+                                            $data = '';
+                                            if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
+                                                $data = collect($res['words_result'])->pluck('words')->implode("\n");
+                                            }
+                                            return $data;
+                                            break;
+                                        case 2:
+                                                $res = BaiduAIPHandler::getInstance('ocr')->basicAccurate(file_get_contents($info['PicUrl']), [
+                                                    'detect_direction' => true,
+                                                ]);
+                                            $data = '';
+                                            if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
+                                                $data = collect($res['words_result'])->pluck('words')->implode("\n");
+                                            }
+                                            return $data;
+                                            break;
+                                        case 3:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->webImageUrl($info['PicUrl'], [
+                                                'detect_direction' => true,
+                                                'detect_language' => true
+                                            ]);
+                                            $data = '';
+                                            if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
+                                                $data = collect($res['words_result'])->pluck('words')->implode("\n");
+                                            }
+                                            return $data;
+                                            break;
+                                        case 4:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->idcard(file_get_contents($info['PicUrl']), 'front', [
+                                                'detect_direction' => true,
+                                                'detect_language' => true
+                                            ]);
+                                            $data = '';
+                                            if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
+                                                foreach ($res['words_result'] as $key => $value) {
+                                                    $data .= "{$key}：{$value['words']}\n";
+                                                }
+                                            }
+                                            return $data;
+                                            break;
+                                        case 5:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->bankcard(file_get_contents($info['PicUrl']));
+                                            $data = '';
+                                            if (! isset($res['error_code']) && $res['result']) {
+                                                $cards = ['银行卡', '借记卡', '信用卡'];
+                                                $data = $res['result']['bank_name'] . $cards[$res['result']['bank_card_type']] . '：' . $res['result']['bank_card_number'];
+                                            }
+                                            return $data;
+                                            break;
+
+                                        case 6:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->businessLicense(file_get_contents($info['PicUrl']));
+                                            $data = '';
+                                            if (! isset($res['error_code']) &&  $res['words_result_num'] > 0) {
+                                                foreach ($res['words_result'] as $key => $value) {
+                                                    $data .= "{$key}：{$value['words']}\n";
+                                                }
+                                            }
+                                            return $data;
+                                            break;
+                                        case 7:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->form(file_get_contents($info['PicUrl']));
+                                            $data = '';
+                                            if (! isset($res['error_code']) &&  $res['forms_result_num'] > 0) {
+                                                // TODO: ........
+                                                dd($res['forms_result']);
+                                            }
+                                            return $data;
+                                            break;
+                                        case 8:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->drivingLicense(file_get_contents($info['PicUrl']), [
+                                                'detect_direction' => true,
+                                            ]);
+                                            $data = '';
+                                            if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
+                                                foreach ($res['words_result'] as $key => $value) {
+                                                    $data .= "{$key}：{$value['words']}\n";
+                                                }
+                                            }
+                                            return $data;
+                                        case 9:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->vehicleLicense(file_get_contents($info['PicUrl']), [
+                                                'detect_direction' => true,
+                                                'accuracy' => 'normal'
+                                            ]);
+                                            $data = '';
+                                            if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
+                                                foreach ($res['words_result'] as $key => $value) {
+                                                    $data .= "{$key}：{$value['words']}\n";
+                                                }
+                                            }
+                                            return $data;
+
+                                        case 10:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->licensePlate(file_get_contents($info['PicUrl']));
+                                            $data = '';
+                                            if (! isset($res['error_code']) && $res['words_result']) {
+                                                $data = $res['words_result']['number'];
+                                            }
+                                            return $data;
+                                            break;
+                                        case 11:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->receipt(file_get_contents($info['PicUrl']), [
+                                                'recognize_granularity' => 'big',
+                                                'probability' => false,
+                                                'accuracy' => 'normal',
+                                                'detect_direction' => true,
+                                            ]);
+                                            $data = '';
+                                            if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
+                                                $data = collect($res['words_result'])->pluck('words')->implode("\n");
+                                            }
+                                            return $data;
+                                            break;
+                                        case 12:
+                                            $res = BaiduAIPHandler::getInstance('ocr')->trainTicket(file_get_contents($info['PicUrl']));
+                                            $data = '';
+                                            if (! isset($res['error_code'])) {
+                                                $data[] = "乘车人：{$res['name']}";
+                                                $data[] = "车号：{$res['train_num']}";
+                                                $data[] = "车票号：{$res['ticket_num']}";
+                                                $data[] = "车票类型：{$res['seat_category']}";
+                                                $data[] = "票价：{$res['ticket_rates']}";
+                                                $data[] = "发车日期：{$res['date']}";
+                                                $data[] = "始发站：{$res['starting_station']}";
+                                                $data[] = "终点站：{$res['destination_station']}";
+                                            }
+                                            return $data;
+                                            break;
+                                    }
+                                    break;
+                            }
+                        }
+
+                    }
                     return '收到文字消息';
                     break;
                 case 'image':
                     //{"ToUserName":"gh_f00d12a6807f","FromUserName":"o3l5Twydfo3yGJMLtqCDZdmVKkW8","CreateTime":"1543482762","MsgType":"image","PicUrl":"http:\/\/mmbiz.qpic.cn\/mmbiz_jpg\/FWEnHfswJqibTSA3zVGVgPkgPrvxvGbCkSiaOVC61V6ia7MT2EJ8WRP8CrYLiaBv0d3wbN0DMcxziaBvVwNCiadCOMOQ\/0","MsgId":"6629207985152081392","MediaId":"_le8aXg-eDTiKVQiWZEiU8442bSJekpm_K46Z4MjzlsvqMRz-5MxozTIlyzztUej"}
                     dispatch(new ReceiveWechatMessage($message));
+                    WechatMessageHandler::getInstance()->pushAction('image', $message);
+                    return WechatMessageHandler::getInstance()->getMenu('image');
                     return '收到图片消息';
                     break;
                 case 'voice':
