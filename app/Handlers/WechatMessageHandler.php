@@ -92,7 +92,7 @@ class WechatMessageHandler
     public function popMessage($openid)
     {
         $message = Redis::rpop(self::message_list_key.$openid);
-        if ($info = json_decode($message)) {
+        if ($info = json_decode($message, true)) {
             return $info;
         } else {
             return $message;
