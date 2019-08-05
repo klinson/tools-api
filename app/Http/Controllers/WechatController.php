@@ -46,8 +46,7 @@ class WechatController extends Controller
                         $action_number = intval($message['Content']);
                         // 数字事件
                         $info = WechatMessageHandler::getInstance()->popMessage($message['FromUserName']);
-                        LogHandler::log('wechat', 'debug', $info);
-
+//                        LogHandler::log('wechat', 'debug', $info);
                         if ($info && isset($info['action'])) {
                             switch ($info['action']) {
                                 case 'image':
@@ -67,7 +66,7 @@ class WechatController extends Controller
                                      */
                                     switch ($action_number) {
                                         case 1:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->basicGeneralUrl($info['PicUrl'], [
+                                            $res = BaiduAIPHandler::getInstance('ocr')->basicGeneralUrl($info['data']['PicUrl'], [
                                                 'detect_direction' => true,
                                                 'detect_language' => true
                                             ]);
@@ -79,7 +78,7 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 2:
-                                                $res = BaiduAIPHandler::getInstance('ocr')->basicAccurate(file_get_contents($info['PicUrl']), [
+                                                $res = BaiduAIPHandler::getInstance('ocr')->basicAccurate(file_get_contents($info['data']['PicUrl']), [
                                                     'detect_direction' => true,
                                                 ]);
                                             if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
@@ -90,7 +89,7 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 3:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->webImageUrl($info['PicUrl'], [
+                                            $res = BaiduAIPHandler::getInstance('ocr')->webImageUrl($info['data']['PicUrl'], [
                                                 'detect_direction' => true,
                                                 'detect_language' => true
                                             ]);
@@ -102,7 +101,7 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 4:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->idcard(file_get_contents($info['PicUrl']), 'front', [
+                                            $res = BaiduAIPHandler::getInstance('ocr')->idcard(file_get_contents($info['data']['PicUrl']), 'front', [
                                                 'detect_direction' => true,
                                                 'detect_language' => true
                                             ]);
@@ -117,7 +116,7 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 5:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->bankcard(file_get_contents($info['PicUrl']));
+                                            $res = BaiduAIPHandler::getInstance('ocr')->bankcard(file_get_contents($info['data']['PicUrl']));
                                             $data = '';
                                             if (! isset($res['error_code']) && $res['result']) {
                                                 $cards = ['银行卡', '借记卡', '信用卡'];
@@ -129,7 +128,7 @@ class WechatController extends Controller
                                             break;
 
                                         case 6:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->businessLicense(file_get_contents($info['PicUrl']));
+                                            $res = BaiduAIPHandler::getInstance('ocr')->businessLicense(file_get_contents($info['data']['PicUrl']));
                                             $data = '';
                                             if (! isset($res['error_code']) &&  $res['words_result_num'] > 0) {
                                                 foreach ($res['words_result'] as $key => $value) {
@@ -141,7 +140,7 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 7:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->form(file_get_contents($info['PicUrl']));
+                                            $res = BaiduAIPHandler::getInstance('ocr')->form(file_get_contents($info['data']['PicUrl']));
                                             $data = '';
                                             if (! isset($res['error_code']) &&  $res['forms_result_num'] > 0) {
                                                 // TODO: ........
@@ -152,7 +151,7 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 8:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->drivingLicense(file_get_contents($info['PicUrl']), [
+                                            $res = BaiduAIPHandler::getInstance('ocr')->drivingLicense(file_get_contents($info['data']['PicUrl']), [
                                                 'detect_direction' => true,
                                             ]);
                                             $data = '';
@@ -165,7 +164,7 @@ class WechatController extends Controller
                                             }
                                             return $data;
                                         case 9:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->vehicleLicense(file_get_contents($info['PicUrl']), [
+                                            $res = BaiduAIPHandler::getInstance('ocr')->vehicleLicense(file_get_contents($info['data']['PicUrl']), [
                                                 'detect_direction' => true,
                                                 'accuracy' => 'normal'
                                             ]);
@@ -180,7 +179,7 @@ class WechatController extends Controller
                                             return $data;
 
                                         case 10:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->licensePlate(file_get_contents($info['PicUrl']));
+                                            $res = BaiduAIPHandler::getInstance('ocr')->licensePlate(file_get_contents($info['data']['PicUrl']));
                                             $data = '';
                                             if (! isset($res['error_code']) && $res['words_result']) {
                                                 $data = $res['words_result']['number'];
@@ -190,7 +189,7 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 11:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->receipt(file_get_contents($info['PicUrl']), [
+                                            $res = BaiduAIPHandler::getInstance('ocr')->receipt(file_get_contents($info['data']['PicUrl']), [
                                                 'recognize_granularity' => 'big',
                                                 'probability' => false,
                                                 'accuracy' => 'normal',
@@ -205,7 +204,7 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 12:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->trainTicket(file_get_contents($info['PicUrl']));
+                                            $res = BaiduAIPHandler::getInstance('ocr')->trainTicket(file_get_contents($info['data']['PicUrl']));
                                             $data = '';
                                             if (! isset($res['error_code'])) {
                                                 $data[] = "乘车人：{$res['name']}";
