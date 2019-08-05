@@ -50,21 +50,21 @@ class WechatController extends Controller
                         if ($info && isset($info['action'])) {
                             switch ($info['action']) {
                                 case 'image':
-                                    /**
-                                    [1]：通用文字识别
-                                    [2]：通用文字识别（高精度版）
-                                    [3]：网络图片文字识别
-                                    [4]：身份证识别
-                                    [5]：银行卡识别
-                                    [6]：营业执照识别
-                                    [7]：表格文字识别
-                                    [8]：驾驶证识别
-                                    [9]：行驶证识别
-                                    [10]：车牌识别
-                                    [11]：通用票据识别
-                                    [12]：火车票识别
-                                     */
                                     switch ($action_number) {
+                                        /**
+                                        [1]：通用文字识别
+                                        [2]：通用文字识别（高精度版）
+                                        [3]：网络图片文字识别
+                                        [4]：身份证识别
+                                        [5]：银行卡识别
+                                        [6]：营业执照识别
+                                        [7]：表格文字识别
+                                        [8]：驾驶证识别
+                                        [9]：行驶证识别
+                                        [10]：车牌识别
+                                        [11]：通用票据识别
+                                        [12]：火车票识别
+                                         */
                                         case 1:
                                             $res = BaiduAIPHandler::getInstance('ocr')->basicGeneralUrl($info['data']['PicUrl'], [
                                                 'detect_direction' => true,
@@ -211,9 +211,37 @@ class WechatController extends Controller
                                             break;
                                     }
                                     break;
+                                case 'text':
+                                    switch ($action_number) {
+                                        case 1:
+                                            if (strlen($info['data']['Content']) > 511) {
+                                                return '识别内容过长，推荐约250个中文汉字或500个英文字符';
+                                            }
+                                            $res = BaiduAIPHandler::getInstance('nlp')->ecnet($info['data']['Content']);
+                                            if (! isset($res['error_code']) && $res['item'] > 0) {
+                                                if ($res['item']['vec_fragment']) {
+                                                    $error = '';
+                                                    foreach ($res['item']['vec_fragment'] as $item) {
+                                                        $error .= "{$item['ori_frag']} => {$item['correct_frag']}";
+                                                    }
+                                                    $error .= "修正后：".$res['item']['correct_query'];
+                                                    return $error;
+                                                } else {
+                                                    return "无错误，很完美～";
+                                                }
+                                            } else {
+                                                $data = '处理失败，请稍后重试';
+                                            }
+                                            return $data;
+                                            break;
+
+                                    }
+                                    break;
                             }
                         }
-
+                    } else {
+                        WechatMessageHandler::getInstance()->pushAction('text', $message);
+                        return WechatMessageHandler::getInstance()->getMenu('text');
                     }
                     return '收到文字消息';
                     break;
