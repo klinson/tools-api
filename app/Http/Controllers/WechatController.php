@@ -218,7 +218,7 @@ class WechatController extends Controller
                                                 return '识别内容过长，推荐约250个中文汉字或500个英文字符';
                                             }
                                             $res = BaiduAIPHandler::getInstance('nlp')->ecnet($info['data']['Content']);
-                                            if (! isset($res['error_code']) && $res['item'] > 0) {
+                                            if (! isset($res['error_code']) && $res['item']) {
                                                 if ($res['item']['vec_fragment']) {
                                                     $error = '';
                                                     foreach ($res['item']['vec_fragment'] as $item) {
