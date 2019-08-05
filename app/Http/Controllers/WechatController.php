@@ -140,23 +140,6 @@ class WechatController extends Controller
                                             return $data;
                                             break;
                                         case 7:
-                                            $res = BaiduAIPHandler::getInstance('ocr')->tableRecognitionAsync(file_get_contents($info['data']['PicUrl']));
-                                            $data = '';
-                                            if (! isset($res['error_code']) &&  $res['result']) {
-                                                $res = BaiduAIPHandler::getInstance('ocr')->getTableRecognitionResult($res['result']['request_id'], ['result_type' => 'json']);
-                                                LogHandler::log('wechat', 'debug', $res);
-                                                if (! isset($res['error_code']) &&  $res['result']) {
-                                                    // TODO: ........
-//                                                    dd($res['result']);
-                                                } else {
-                                                    $data = '识别失败，请稍后重试';
-                                                }
-                                            } else {
-                                                $data = '识别失败，请稍后重试';
-                                            }
-                                            return $data;
-                                            break;
-                                        case 8:
                                             $res = BaiduAIPHandler::getInstance('ocr')->drivingLicense(file_get_contents($info['data']['PicUrl']), [
                                                 'detect_direction' => true,
                                             ]);
@@ -169,7 +152,7 @@ class WechatController extends Controller
                                                 $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
-                                        case 9:
+                                        case 8:
                                             $res = BaiduAIPHandler::getInstance('ocr')->vehicleLicense(file_get_contents($info['data']['PicUrl']), [
                                                 'detect_direction' => true,
                                                 'accuracy' => 'normal'
@@ -184,7 +167,7 @@ class WechatController extends Controller
                                             }
                                             return $data;
 
-                                        case 10:
+                                        case 9:
                                             $res = BaiduAIPHandler::getInstance('ocr')->licensePlate(file_get_contents($info['data']['PicUrl']));
                                             $data = '';
                                             if (! isset($res['error_code']) && $res['words_result']) {
@@ -194,7 +177,7 @@ class WechatController extends Controller
                                             }
                                             return $data;
                                             break;
-                                        case 11:
+                                        case 10:
                                             $res = BaiduAIPHandler::getInstance('ocr')->receipt(file_get_contents($info['data']['PicUrl']), [
                                                 'recognize_granularity' => 'big',
                                                 'probability' => false,
@@ -209,7 +192,7 @@ class WechatController extends Controller
                                             }
                                             return $data;
                                             break;
-                                        case 12:
+                                        case 11:
                                             $res = BaiduAIPHandler::getInstance('ocr')->trainTicket(file_get_contents($info['data']['PicUrl']));
                                             $data = '';
                                             if (! isset($res['error_code'])) {
