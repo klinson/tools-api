@@ -59,6 +59,9 @@ class WechatMessageHandler
 
     public function getMenu($type)
     {
+        if (isset(self::message_menus[$type.'_text'])) {
+            return self::message_menus[$type.'_text'];
+        }
         $text = '';
         foreach (self::message_menus[$type] as $key => $menu) {
             $text .= "[$key]：$menu\n";
