@@ -46,6 +46,8 @@ class WechatController extends Controller
                         $action_number = intval($message['Content']);
                         // 数字事件
                         $info = WechatMessageHandler::getInstance()->popMessage($message['FromUserName']);
+                        LogHandler::log('wechat', 'debug', $info);
+
                         if ($info && isset($info['action'])) {
                             switch ($info['action']) {
                                 case 'image':
@@ -69,9 +71,10 @@ class WechatController extends Controller
                                                 'detect_direction' => true,
                                                 'detect_language' => true
                                             ]);
-                                            $data = '';
                                             if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
                                                 $data = collect($res['words_result'])->pluck('words')->implode("\n");
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
@@ -79,9 +82,10 @@ class WechatController extends Controller
                                                 $res = BaiduAIPHandler::getInstance('ocr')->basicAccurate(file_get_contents($info['PicUrl']), [
                                                     'detect_direction' => true,
                                                 ]);
-                                            $data = '';
                                             if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
                                                 $data = collect($res['words_result'])->pluck('words')->implode("\n");
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
@@ -90,9 +94,10 @@ class WechatController extends Controller
                                                 'detect_direction' => true,
                                                 'detect_language' => true
                                             ]);
-                                            $data = '';
                                             if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
                                                 $data = collect($res['words_result'])->pluck('words')->implode("\n");
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
@@ -106,6 +111,8 @@ class WechatController extends Controller
                                                 foreach ($res['words_result'] as $key => $value) {
                                                     $data .= "{$key}：{$value['words']}\n";
                                                 }
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
@@ -115,6 +122,8 @@ class WechatController extends Controller
                                             if (! isset($res['error_code']) && $res['result']) {
                                                 $cards = ['银行卡', '借记卡', '信用卡'];
                                                 $data = $res['result']['bank_name'] . $cards[$res['result']['bank_card_type']] . '：' . $res['result']['bank_card_number'];
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
@@ -126,6 +135,8 @@ class WechatController extends Controller
                                                 foreach ($res['words_result'] as $key => $value) {
                                                     $data .= "{$key}：{$value['words']}\n";
                                                 }
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
@@ -135,6 +146,8 @@ class WechatController extends Controller
                                             if (! isset($res['error_code']) &&  $res['forms_result_num'] > 0) {
                                                 // TODO: ........
                                                 dd($res['forms_result']);
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
@@ -147,6 +160,8 @@ class WechatController extends Controller
                                                 foreach ($res['words_result'] as $key => $value) {
                                                     $data .= "{$key}：{$value['words']}\n";
                                                 }
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                         case 9:
@@ -159,6 +174,8 @@ class WechatController extends Controller
                                                 foreach ($res['words_result'] as $key => $value) {
                                                     $data .= "{$key}：{$value['words']}\n";
                                                 }
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
 
@@ -167,6 +184,8 @@ class WechatController extends Controller
                                             $data = '';
                                             if (! isset($res['error_code']) && $res['words_result']) {
                                                 $data = $res['words_result']['number'];
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
@@ -180,6 +199,8 @@ class WechatController extends Controller
                                             $data = '';
                                             if (! isset($res['error_code']) && $res['words_result_num'] > 0) {
                                                 $data = collect($res['words_result'])->pluck('words')->implode("\n");
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
@@ -195,6 +216,8 @@ class WechatController extends Controller
                                                 $data[] = "发车日期：{$res['date']}";
                                                 $data[] = "始发站：{$res['starting_station']}";
                                                 $data[] = "终点站：{$res['destination_station']}";
+                                            } else {
+                                                $data = '识别失败，请稍后重试';
                                             }
                                             return $data;
                                             break;
