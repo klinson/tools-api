@@ -217,7 +217,7 @@ class WechatController extends Controller
                                         case 1:
                                             $iv = date('Ymd');
                                             $key = cache()->remember('des_key_'.$iv, 24*60*60, function () {
-                                                return random_string(6, 8);
+                                                return random_string(24, 6);
                                             });
 
                                             $Des = new DesHandler($key, 'DES-EDE3-CBC', DesHandler::OUTPUT_BASE64, $iv);
@@ -230,7 +230,7 @@ class WechatController extends Controller
                                         case 2:
                                             $iv = date('Ymd');
                                             $key = cache()->remember('des_key_'.$iv, 24*60*60, function () {
-                                                return random_string(6, 8);
+                                                return random_string(24, 6);
                                             });
 
                                             $Des = new DesHandler($key, 'DES-EDE3-CBC', DesHandler::OUTPUT_BASE64, $iv);
