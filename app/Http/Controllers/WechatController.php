@@ -216,7 +216,7 @@ class WechatController extends Controller
                                     switch ($action_number) {
                                         case 1:
                                             $iv = date('Ymd');
-                                            $key = cache()->remember('des_key_'.$iv, 24*60*60, function () {
+                                            $key = cache()->remember('des_key_'.$iv, 24*60, function () {
                                                 return random_string(24, 6);
                                             });
 
@@ -229,7 +229,7 @@ class WechatController extends Controller
                                             break;
                                         case 2:
                                             $iv = date('Ymd');
-                                            $key = cache()->remember('des_key_'.$iv, 24*60*60, function () {
+                                            $key = cache()->remember('des_key_'.$iv, 24*60, function () {
                                                 return random_string(24, 6);
                                             });
 
