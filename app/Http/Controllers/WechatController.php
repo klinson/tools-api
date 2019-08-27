@@ -8,6 +8,7 @@
 
 namespace App\Http\Controllers;
 use App\Handlers\BaiduAIPHandler;
+use App\Handlers\DesHandler;
 use App\Handlers\LogHandler;
 use App\Handlers\WechatMessageHandler;
 use App\Jobs\ReceiveWechatMessage;
@@ -214,6 +215,32 @@ class WechatController extends Controller
                                 case 'text':
                                     switch ($action_number) {
                                         case 1:
+                                            $iv = date('Ymd');
+                                            $key = cache()->remember('des_key_'.$iv, 24*60*60, function () {
+                                                return random_string(6, 8);
+                                            });
+
+                                            $Des = new DesHandler($key, 'DES-EDE3-CBC', DesHandler::OUTPUT_BASE64, $iv);
+                                            $str = $Des->encrypt($info['data']['Content']);
+                                            if (! $str) {
+                                                $str = '加密失败，请重试～';
+                                            }
+                                            return $str;
+                                            break;
+                                        case 2:
+                                            $iv = date('Ymd');
+                                            $key = cache()->remember('des_key_'.$iv, 24*60*60, function () {
+                                                return random_string(6, 8);
+                                            });
+
+                                            $Des = new DesHandler($key, 'DES-EDE3-CBC', DesHandler::OUTPUT_BASE64, $iv);
+                                            $str = $Des->decrypt($info['data']['Content']);
+                                            if (! $str) {
+                                                $str = '解密失败，请重试～';
+                                            }
+                                            return $str;
+                                            break;
+                                        case 3:
                                             if (strlen($info['data']['Content']) > 511) {
                                                 return '识别内容过长，推荐约250个中文汉字或500个英文字符';
                                             }

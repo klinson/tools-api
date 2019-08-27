@@ -16,7 +16,9 @@ class WechatMessageHandler
     const message_list_key = 'wechat_message_list:';
     const message_menus = [
         'text' => [
-            1 => '句子错别字审查'
+            1 => '文字加密',
+            2 => '文字解密',
+            3 => '句子错别字审查',
         ],
         'image' => [
             1 => '通用文字识别',
@@ -32,7 +34,9 @@ class WechatMessageHandler
             11 => '火车票识别',
         ],
         'text_text' => '请选择操作功能？
-[1]：句子错别字审查',
+[1]：文字加密,
+[2]：文字解密,
+[3]：句子错别字审查',
         'image_text' => '请选择操作功能？
 [1]：通用文字识别
 [2]：通用文字识别（高精度版）
