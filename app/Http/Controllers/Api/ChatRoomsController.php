@@ -7,6 +7,7 @@ use App\Models\Friend;
 use App\Transformers\ChatRoomTransformer;
 use Illuminate\Http\Request;
 use Auth;
+use DB;
 
 class ChatRoomsController extends Controller
 {
@@ -16,10 +17,15 @@ class ChatRoomsController extends Controller
         $query->whereHas('hasUsers', function ($query) {
             $query->where('user_id', Auth::id());
         });
+        $prefix = DB::connection()->getConfig('prefix');
 
-        $query->join('chat_messages', 'chat_messages.chat_room_id', '=', 'chat_rooms.id');
-        $query->distinct();
-        $query->select(['chat_rooms.*']);
+        $subQuery = DB::table('chat_messages')
+            ->select(['chat_room_id', DB::raw('max(created_at) as last_message_at')])
+            ->groupBy('chat_room_id')
+            ->whereNull('deleted_at');
+
+        $query->leftJoin(DB::raw("({$subQuery->toSql()}) as {$prefix}sub"), 'sub.chat_room_id', '=', 'chat_rooms.id');
+
 //        $query->select(['chat_rooms.*', 'chat_messages.created_at as message_created_at', 'chat_messages.content as message_content']);
 //        $query->orderBy('message_created_at', 'desc');
         $list = $query->get();
