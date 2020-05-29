@@ -21,7 +21,7 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12 col-md-12">
-            <h3 class="text-center">相似文本查询</h3>
+            <h3 class="text-center">短文本相似度查询</h3>
             <hr>
         </div>
     </div>
@@ -30,12 +30,12 @@
             <form action="{{ route('nlp.simple') }}" method="post" id="form1">
                 {{ csrf_field() }}
                 <div class="form-group">
-                    <label for="name">文本1</label>
-                    <textarea class="form-control" rows="5" name="text1" required></textarea>
+                    <label for="name">文本1（<span id="text1_count">0</span>/250）</label>
+                    <textarea class="form-control" rows="5" name="text1" required onchange="setCount('textarea[name=text1]', '#text1_count')"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="name">文本2</label>
-                    <textarea class="form-control" rows="5" name="text2" required></textarea>
+                    <label for="name">文本2（<span id="text2_count">0</span>/250）</label>
+                    <textarea class="form-control" rows="5" name="text2" required onchange="setCount('textarea[name=text2]', '#text2_count')"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="name">模型</label>
@@ -57,7 +57,7 @@
     <div class="row" style="margin-top: 1em">
         <div class="col-sm-12 col-md-12">
             <div class="well">
-                <p>分数：<span id="result"></span></p>
+                <p>相似度：<span id="result" style="color: red"></span></p>
             </div>
         </div>
     </div>
@@ -67,6 +67,7 @@
 <script src="{{ asset($_theme_info['style_root_path'].'/js/vendor/bootstrap.min.js') }}"></script>
 
 <script>
+    var result = $('#result');
     function submitForm(formSelect) {
         var formObj = $(formSelect);
         console.log(formObj)
@@ -81,9 +82,20 @@
                 alert("请求错误");
             },
             success: function(data) {  //成功
-                alert(data);  //就将返回的数据显示出来
+                console.log(data)
+                if (! data.ret) {
+                    result.html(data.msg)
+                    alert(data.msg)
+                } else {
+                    var score = parseFloat(data.data.score) * 100
+                    result.html(score + ' %')
+                }
             }
         });
+    }
+
+    function setCount(inputSelector, outputSelector) {
+        $(outputSelector).html($(inputSelector).val().length)
     }
 </script>
 
