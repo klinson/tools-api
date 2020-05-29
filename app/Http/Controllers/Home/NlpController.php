@@ -18,14 +18,23 @@ class NlpController extends Controller
     {
         if ($request->isMethod('post')) {
             $data = $request->only(['text1', 'text2', 'model']);
-            $res = BaiduAIPHandler::getInstance('nlp', 'nlp')->simnet($data['text1'], $data['text2'], [
-//                'model' => $data['model'],
+            $res = BaiduAIPHandler::getInstance('nlp')->simnet($data['text1'], $data['text2'], [
+                'model' => $data['model'],
             ]);
-            dd($res, $data);
-            return [
-                'ret' => 1,//1success,0error
-                ''
-            ];
+            if (isset($res['error_code']) && !empty($res['error_code'])) {
+                return [
+                    'ret' => 0,//1success,0error
+                    'msg' => '失败：'.$res['error_msg']
+                ];
+            } else {
+                return [
+                    'ret' => 1,//1success,0error
+                    'msg' => '',
+                    'data' => [
+                        'score' => $res['score']
+                    ]
+                ];
+            }
         } else {
             return $this->view();
         }
